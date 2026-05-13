@@ -68,8 +68,31 @@ app.get('/', (req, res) => {
         <div class="cron-info">
           <h2>Schedule</h2>
           <p>Cron: <code>${LESSON_CRON}</code> — lessons delivered automatically on this schedule.</p>
-          <p style="margin-top:8px;font-size:0.875rem;color:#6B7280;">POST <code>/trigger</code> to send lessons manually.</p>
+          <button onclick="triggerNow()" id="triggerBtn" style="margin-top:16px;background:#2E7D32;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-size:0.95rem;font-weight:600;cursor:pointer;">Send Lessons Now</button>
+          <div id="triggerResult" style="margin-top:12px;font-size:0.875rem;"></div>
         </div>
+        <script>
+          async function triggerNow() {
+            const btn = document.getElementById('triggerBtn');
+            const out = document.getElementById('triggerResult');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            out.textContent = '';
+            try {
+              const res = await fetch('/trigger', { method: 'POST' });
+              const data = await res.json();
+              out.style.color = data.success ? '#16A34A' : '#DC2626';
+              out.textContent = data.success
+                ? 'Done — sent: ' + data.sent + ', skipped: ' + data.skipped + (data.errors.length ? ', errors: ' + data.errors.join('; ') : '')
+                : 'Error: ' + data.error;
+            } catch (e) {
+              out.style.color = '#DC2626';
+              out.textContent = 'Request failed: ' + e.message;
+            }
+            btn.disabled = false;
+            btn.textContent = 'Send Lessons Now';
+          }
+        </script>
       </main>
     </body>
     </html>
