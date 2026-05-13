@@ -3,9 +3,10 @@
     {
       "id": "1778694463142",
       "name": "Rigwe",
-      "email": "rigwemutua@gmail.com",
-      "currentLesson": 0,
-      "enrolledAt": "2026-05-13T17:47:43.142Z"
+      "email": "iromanus@gmail.com",
+      "currentLesson": 1,
+      "enrolledAt": "2026-05-13T17:47:43.142Z",
+      "lastSentAt": "2026-05-13T19:28:49.199Z"
     }
   ],
   "lessons": [

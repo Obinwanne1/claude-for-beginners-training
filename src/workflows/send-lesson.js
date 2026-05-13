@@ -1,21 +1,6 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const db = require('../db');
-
-function createTransporter() {
-  const port = Number(process.env.SMTP_PORT) || 587;
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    connectionTimeout: 10000,
-    socketTimeout: 10000,
-  });
-}
 
 /**
  * Build HTML email for a lesson.
@@ -40,7 +25,6 @@ function buildLessonEmail(learner, lesson) {
         .lesson-badge { display: inline-block; background: #e8f5e9; color: #2E7D32; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin-bottom: 16px; }
         h2 { font-size: 1.25rem; margin: 0 0 16px; color: #1A1A1A; }
         .content { font-size: 0.95rem; line-height: 1.7; color: #374151; white-space: pre-line; }
-        .cta { display: inline-block; margin-top: 24px; background: #2E7D32; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
         .footer { padding: 16px 32px; background: #f3f4f6; font-size: 0.75rem; color: #6B7280; text-align: center; }
       </style>
     </head>
@@ -71,16 +55,18 @@ function buildLessonEmail(learner, lesson) {
  * @returns {{ sent: number, skipped: number, errors: string[] }}
  */
 async function sendScheduledLessons() {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const data = db.read();
   const learners = data.learners || [];
   const lessons = data.lessons || [];
 
   if (lessons.length === 0) {
-    console.warn('[send-lesson] No lessons in DB. Add lessons to src/db/data.json.');
+    console.warn('[send-lesson] No lessons in DB.');
     return { sent: 0, skipped: learners.length, errors: [] };
   }
 
   const totalLessons = lessons.length;
+  const fromAddress = `${process.env.FROM_NAME || 'Greenfield Training'} <${process.env.FROM_EMAIL}>`;
   let sent = 0;
   let skipped = 0;
   const errors = [];
@@ -90,21 +76,21 @@ async function sendScheduledLessons() {
 
     if (lessonIndex >= totalLessons) {
       skipped++;
-      continue; // Learner completed all lessons
+      continue;
     }
 
     const lesson = { ...lessons[lessonIndex], order: lessonIndex + 1, totalLessons };
 
     try {
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: `"${process.env.FROM_NAME || 'Greenfield Training'}" <${process.env.FROM_EMAIL || process.env.SMTP_USER}>`,
+      const { error } = await resend.emails.send({
+        from: fromAddress,
         to: learner.email,
         subject: `Lesson ${lesson.order}: ${lesson.title} — Claude for Beginners`,
         html: buildLessonEmail(learner, lesson),
       });
 
-      // Advance learner to next lesson
+      if (error) throw new Error(error.message);
+
       learner.currentLesson = lessonIndex + 1;
       learner.lastSentAt = new Date().toISOString();
       sent++;
