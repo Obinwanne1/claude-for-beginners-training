@@ -119,7 +119,10 @@ app.get('/', (req, res) => {
                     : '<span class="badge">Lesson ' + (l.currentLesson + 1) + ' / ' + lessonCount + '</span>'
                   }</td>
                   <td style="color:#6B7280">${new Date(l.enrolledAt).toLocaleDateString()}</td>
-                  <td><button onclick="removeLearner('${escHtml(l.id)}')" style="background:none;border:1px solid #DC2626;color:#DC2626;padding:4px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer;">Remove</button></td>
+                  <td style="display:flex;gap:6px;">
+                    <button onclick="resetLearner('${escHtml(l.id)}')" style="background:none;border:1px solid #2E7D32;color:#2E7D32;padding:4px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer;">Reset</button>
+                    <button onclick="removeLearner('${escHtml(l.id)}')" style="background:none;border:1px solid #DC2626;color:#DC2626;padding:4px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer;">Remove</button>
+                  </td>
                 </tr>`).join('') || '<tr><td colspan="5" style="color:#6B7280;text-align:center;padding:20px;">No learners yet</td></tr>'}
             </tbody>
           </table>
@@ -164,6 +167,15 @@ app.get('/', (req, res) => {
             } catch (e) {
               msg.style.color='#DC2626'; msg.textContent='Request failed: ' + e.message;
             }
+          }
+
+          async function resetLearner(id) {
+            if (!confirm('Reset this learner to Lesson 1?')) return;
+            try {
+              const res = await fetch('/learners/' + id + '/reset', { method: 'POST' });
+              if (res.ok) location.reload();
+              else { const d = await res.json(); alert('Error: ' + d.error); }
+            } catch (e) { alert('Request failed: ' + e.message); }
           }
 
           async function removeLearner(id) {
@@ -241,6 +253,17 @@ app.post('/learners', (req, res) => {
   data.learners.push(learner);
   db.write(data);
   res.status(201).json(learner);
+});
+
+app.post('/learners/:id/reset', (req, res) => {
+  const db = require('./db');
+  const data = db.read();
+  const learner = (data.learners || []).find(l => l.id === req.params.id);
+  if (!learner) return res.status(404).json({ error: 'Learner not found' });
+  learner.currentLesson = 0;
+  delete learner.lastSentAt;
+  db.write(data);
+  res.json({ success: true });
 });
 
 app.delete('/learners/:id', (req, res) => {
