@@ -107,7 +107,7 @@ app.get('/', (req, res) => {
           <h2>Learners <span id="learnerCount" style="color:#6B7280;font-weight:400;font-size:0.875rem;">(${learnerCount})</span></h2>
           <table class="learners-table">
             <thead>
-              <tr><th>Name</th><th>Email</th><th>Progress</th><th>Enrolled</th></tr>
+              <tr><th>Name</th><th>Email</th><th>Progress</th><th>Enrolled</th><th></th></tr>
             </thead>
             <tbody id="learnersBody">
               ${(data.learners || []).map(l => `
@@ -119,7 +119,8 @@ app.get('/', (req, res) => {
                     : '<span class="badge">Lesson ' + (l.currentLesson + 1) + ' / ' + lessonCount + '</span>'
                   }</td>
                   <td style="color:#6B7280">${new Date(l.enrolledAt).toLocaleDateString()}</td>
-                </tr>`).join('') || '<tr><td colspan="4" style="color:#6B7280;text-align:center;padding:20px;">No learners yet</td></tr>'}
+                  <td><button onclick="removeLearner('${escHtml(l.id)}')" style="background:none;border:1px solid #DC2626;color:#DC2626;padding:4px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer;">Remove</button></td>
+                </tr>`).join('') || '<tr><td colspan="5" style="color:#6B7280;text-align:center;padding:20px;">No learners yet</td></tr>'}
             </tbody>
           </table>
         </div>
@@ -163,6 +164,15 @@ app.get('/', (req, res) => {
             } catch (e) {
               msg.style.color='#DC2626'; msg.textContent='Request failed: ' + e.message;
             }
+          }
+
+          async function removeLearner(id) {
+            if (!confirm('Remove this learner?')) return;
+            try {
+              const res = await fetch('/learners/' + id, { method: 'DELETE' });
+              if (res.ok) location.reload();
+              else { const d = await res.json(); alert('Error: ' + d.error); }
+            } catch (e) { alert('Request failed: ' + e.message); }
           }
 
           async function triggerNow() {
@@ -231,6 +241,18 @@ app.post('/learners', (req, res) => {
   data.learners.push(learner);
   db.write(data);
   res.status(201).json(learner);
+});
+
+app.delete('/learners/:id', (req, res) => {
+  const db = require('./db');
+  const data = db.read();
+  const before = (data.learners || []).length;
+  data.learners = (data.learners || []).filter(l => l.id !== req.params.id);
+  if (data.learners.length === before) {
+    return res.status(404).json({ error: 'Learner not found' });
+  }
+  db.write(data);
+  res.json({ success: true });
 });
 
 // Schedule cron job
