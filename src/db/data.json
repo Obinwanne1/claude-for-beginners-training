@@ -1,0 +1,30 @@
+{
+  "learners": [],
+  "lessons": [
+    {
+      "id": "lesson-1",
+      "title": "What is Claude?",
+      "content": "Welcome to Claude for Beginners!\n\nClaude is an AI assistant made by Anthropic. Think of it as a very capable text-based tool you can have a conversation with.\n\nYou can ask Claude to:\n- Answer questions\n- Write and edit text\n- Explain complex topics simply\n- Help you brainstorm ideas\n- Review and improve your writing\n\nOver the next few lessons, you'll learn how to get the most out of Claude — starting with the basics and building up to practical workflows.\n\nYour first challenge: Open Claude (claude.ai) and say hello. Ask it something simple, like 'What's the capital of France?' and see what happens."
+    },
+    {
+      "id": "lesson-2",
+      "title": "Writing Your First Prompt",
+      "content": "A prompt is what you type to Claude. The quality of your prompt directly affects the quality of Claude's response.\n\nBasic prompt structure:\n1. Context — tell Claude what the situation is\n2. Task — tell Claude what you want it to do\n3. Format — tell Claude how you want the answer\n\nExample (weak prompt):\n'Write something about dogs.'\n\nExample (strong prompt):\n'Write a 3-sentence summary about Labrador Retrievers for a first-time dog owner. Use simple language.'\n\nKey tip: Be specific. The more context you give, the better the result.\n\nChallenge: Ask Claude to explain something you're curious about. Try both a vague version and a specific version. Notice the difference."
+    },
+    {
+      "id": "lesson-3",
+      "title": "Giving Claude a Role",
+      "content": "One of the most powerful techniques is telling Claude who to be.\n\nInstead of: 'Explain machine learning'\nTry: 'You are a patient teacher explaining machine learning to a 12-year-old. Use simple words and a real-world analogy.'\n\nRoles you can use:\n- 'You are an expert copywriter...'\n- 'You are a friendly customer support agent...'\n- 'You are a strict code reviewer...'\n- 'You are a Socratic tutor who only asks questions...'\n\nWhy it works: Claude adjusts its tone, vocabulary, and depth to match the role you assign.\n\nChallenge: Ask Claude the same question twice — once normally, once with a role. Compare the outputs."
+    },
+    {
+      "id": "lesson-4",
+      "title": "Multi-Turn Conversations",
+      "content": "Claude remembers everything said earlier in a conversation. This is called context.\n\nYou can:\n- Ask follow-up questions: 'Can you expand on point 2?'\n- Correct Claude: 'That's not quite right — I meant X, not Y'\n- Build on previous answers: 'Now turn that into a bullet-point list'\n- Refine iteratively: 'Make it shorter' / 'Make it more formal'\n\nGood practice:\n- Stay in one conversation for related tasks\n- Start a new conversation for unrelated topics (context from old topics can confuse Claude)\n\nChallenge: Start a conversation where you ask Claude to write a short bio for a fictional person, then ask it to rewrite it in three different tones: formal, casual, and humorous."
+    },
+    {
+      "id": "lesson-5",
+      "title": "Practical Use Cases",
+      "content": "Congratulations — you've completed Claude for Beginners!\n\nHere are practical ways to use Claude every day:\n\nFor work:\n- Draft and edit emails\n- Summarise long documents\n- Write job descriptions or proposals\n- Generate meeting agendas\n\nFor learning:\n- Explain concepts you don't understand\n- Quiz yourself on any topic\n- Get step-by-step explanations\n\nFor creativity:\n- Brainstorm ideas\n- Write first drafts\n- Get feedback on your writing\n\nFor productivity:\n- Create checklists and plans\n- Break down complex tasks\n- Organise your thoughts\n\nNext step: Pick one task from your real life this week and try to do it with Claude's help. Start small — the habit builds fast.\n\nThank you for training with Greenfield Training!"
+    }
+  ]
+}
