@@ -104,7 +104,10 @@ app.get('/', (req, res) => {
 
         <!-- Learners List -->
         <div class="panel">
-          <h2>Learners <span id="learnerCount" style="color:#6B7280;font-weight:400;font-size:0.875rem;">(${learnerCount})</span></h2>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h2 style="margin:0;">Learners <span style="color:#6B7280;font-weight:400;font-size:0.875rem;">(${learnerCount})</span></h2>
+            <button class="btn btn-outline" onclick="resetAll()" style="font-size:0.8rem;padding:6px 14px;">Reset All to Lesson 1</button>
+          </div>
           <table class="learners-table">
             <thead>
               <tr><th>Name</th><th>Email</th><th>Progress</th><th>Enrolled</th><th></th></tr>
@@ -167,6 +170,15 @@ app.get('/', (req, res) => {
             } catch (e) {
               msg.style.color='#DC2626'; msg.textContent='Request failed: ' + e.message;
             }
+          }
+
+          async function resetAll() {
+            if (!confirm('Reset ALL learners to Lesson 1?')) return;
+            try {
+              const res = await fetch('/learners/reset-all', { method: 'POST' });
+              if (res.ok) location.reload();
+              else { const d = await res.json(); alert('Error: ' + d.error); }
+            } catch (e) { alert('Request failed: ' + e.message); }
           }
 
           async function resetLearner(id) {
@@ -253,6 +265,14 @@ app.post('/learners', (req, res) => {
   data.learners.push(learner);
   db.write(data);
   res.status(201).json(learner);
+});
+
+app.post('/learners/reset-all', (req, res) => {
+  const db = require('./db');
+  const data = db.read();
+  (data.learners || []).forEach(l => { l.currentLesson = 0; delete l.lastSentAt; });
+  db.write(data);
+  res.json({ success: true, reset: (data.learners || []).length });
 });
 
 app.post('/learners/:id/reset', (req, res) => {
