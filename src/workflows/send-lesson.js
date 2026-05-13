@@ -2,15 +2,17 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const db = require('../db');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
 
 /**
  * Build HTML email for a lesson.
@@ -91,6 +93,7 @@ async function sendScheduledLessons() {
     const lesson = { ...lessons[lessonIndex], order: lessonIndex + 1, totalLessons };
 
     try {
+      const transporter = createTransporter();
       await transporter.sendMail({
         from: `"${process.env.FROM_NAME || 'Greenfield Training'}" <${process.env.FROM_EMAIL || process.env.SMTP_USER}>`,
         to: learner.email,
